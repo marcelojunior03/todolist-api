@@ -1,29 +1,36 @@
 from flask import jsonify
+from conexao import get_conexao
+from psycopg2.extras import RealDictCursor
 
 def buscar_tarefas():
-    tarefas = [
-        {
-            'id': 1,
-            'nome': 'Aprender digitação',
-            'descricao': 'Vamos aumentar o zoom para não errar a digitação',
-            'status': 'Pendente'
-        },
-        {
-            'id': 2,
-            'nome': 'Aprender Python',
-            'descricao': 'Aprender Python para programar apis',
-            'status': 'Pendente'
-        }
-    ]
+    #Conecta no banco de dados
+    con = get_conexao()
+    cursor = con.cursor(cursor_factory = RealDictCursor)
+    cursor.execute(
+        "SELECT id, name, description FROM todos;"
+    )
+    #Busca os dados e armazena na variável
+    todos = cursor.fetchall()
 
-    return jsonify(tarefas)
+    #Fecha as conexões
+    cursor.close()
+    con.close()
 
-def buscar_tarefa():
-    tarefa = {
-        'id': 1,
-        'nome': 'Aprender digitação',
-        'descricao': 'Vamos aumentar o zoom para não errar a digitação',
-        'status': 'Pendente'
-    }
+    return jsonify(todos)
 
-    return jsonify(tarefa)
+def buscar_tarefa(id):
+    #Conecta no banco de dados
+    con = get_conexao()
+    cursor = con.cursor(cursor_factory = RealDictCursor)
+    cursor.execute(
+        "SELECT id, name, description FROM todos WHERE id = %s;",
+        (id,)
+    )
+    #Busca os dados e armazena na variável
+    todo = cursor.fetchone()
+
+    #Fecha as conexões
+    cursor.close()
+    con.close()
+
+    return jsonify(todo)

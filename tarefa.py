@@ -34,3 +34,39 @@ def buscar_tarefa(id):
     con.close()
 
     return jsonify(todo)
+
+def criar_tarefa(name, description):
+    con = get_conexao()
+    cursor = con.cursor()
+    cursor.execute(
+        "INSERT INTO todos (name, description) VALUES (%s, %s)",
+        (name, description)
+    )
+    #Enviar as modificações para o banco de dados
+    con.commit()
+
+    #Encerrar as conexões com o banco de dados
+    cursor.close()
+    con.close()
+
+def apagar_tarefa(tarefa_id):
+    con = get_conexao()
+    cursor = con.cursor()
+    cursor.execute(
+        "DELETE FROM todos WHERE id = %s",
+        (tarefa_id,)
+    )
+    con.commit()
+    cursor.close()
+    con.close()
+
+def atualizar_tarefa(tarefa_id, name, description):
+    con = get_conexao()
+    cursor = con.cursor()
+    cursor.execute(
+        "UPDATE todos SET name=%s, description=%s WHERE id=%s",
+        (name, description, tarefa_id)
+    )
+    con.commit()
+    cursor.close()
+    con.close()
